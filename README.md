@@ -1,41 +1,66 @@
 # viwer
 
-A tiny, single-file Markdown viewer. Open `index.html` in a browser, drop a `.md` file, read it.
+A single-file Markdown viewer. Drop a `.md` file, read it. Nothing is uploaded, nothing is stored.
 
-No build step, no server, no upload — the file never leaves your machine.
+**[viwer-sigma.vercel.app](https://viwer-sigma.vercel.app/)**
+
+There is no build step, no bundler and no server — `index.html` is the whole application.
+Open it from disk and it works exactly the same as the hosted version.
+
+## Why
+
+Most Markdown previewers want you to install an editor, sign in, or paste your document
+into someone else's server. This one is a page you open. Your file is read by the browser's
+`FileReader` and rendered locally; it never leaves the machine.
 
 ## Features
 
-- Drag & drop or file picker (`.md`, `.markdown`, `.txt`)
-- GitHub-flavoured Markdown: tables, task lists, footnotes, strikethrough
-- Syntax highlighting for code blocks + one-click copy button
-- Auto-generated outline sidebar from headings
-- Light / dark theme (remembers your choice, follows system by default)
-- Print / Save as PDF with a clean print stylesheet
-- Output sanitised with DOMPurify
+- Drag and drop, or open with <kbd>⌘O</kbd> / <kbd>Ctrl+O</kbd>
+- GitHub-flavoured Markdown — tables, task lists, strikethrough, fenced code
+- Syntax highlighting with a copy button on every code block
+- Outline sidebar generated from headings, with the current section highlighted while you scroll
+- Serif or sans reading typeface, light or dark, both remembered
+- Reading progress bar and a word / minute count
+- Print or save to PDF with the interface stripped out
+- Rendered HTML sanitised with DOMPurify
 
-## Usage
+## Run it
 
 ```bash
 git clone https://github.com/prakhar1605/viwer.git
 cd viwer
-open index.html        # macOS
-# xdg-open index.html  # Linux
+open index.html          # macOS
+# xdg-open index.html    # Linux
+# start index.html       # Windows
 ```
 
-## Shortcuts
+To host your own copy, point any static host at the repository root. No configuration needed.
+
+## Keyboard
 
 | Key | Action |
 |---|---|
-| `Cmd/Ctrl + O` | Open a file |
-| `Cmd/Ctrl + P` | Print / save as PDF |
+| <kbd>⌘O</kbd> / <kbd>Ctrl+O</kbd> | Open a file |
+| <kbd>⌘P</kbd> / <kbd>Ctrl+P</kbd> | Print or save as PDF |
 
-## Notes
+## Built on
 
-Rendering libraries (`marked`, `DOMPurify`, `highlight.js`) load from jsDelivr, so the first
-open needs internet. Want it fully offline? Download those three files into a `vendor/`
-folder and point the `<script>` tags there.
+[marked](https://github.com/markedjs/marked) for parsing,
+[DOMPurify](https://github.com/cure53/DOMPurify) for sanitising,
+[highlight.js](https://github.com/highlightjs/highlight.js) for code.
+All three load from jsDelivr, so the first open needs a connection. For a fully offline
+copy, download the three files into `vendor/` and repoint the `<script>` tags.
+
+## Contributing
+
+Issues and pull requests are welcome. The whole app is one file, so:
+
+1. Edit `index.html`
+2. Open it in a browser and check light mode, dark mode, and a narrow window
+3. Open a PR describing what changed and why
+
+Keep it dependency-light and keep it to a single file — that constraint is the point.
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).
