@@ -1,6 +1,6 @@
 # viwer
 
-A single-file Markdown viewer. Drop a `.md` file, read it. Nothing is uploaded, nothing is stored.
+A single-file viewer for Markdown and PDF. Open a file, read it. Nothing is uploaded, nothing is stored.
 
 **[viwer-sigma.vercel.app](https://viwer-sigma.vercel.app/)**
 
@@ -16,8 +16,10 @@ into someone else's server. This one is a page you open. Your file is read by th
 ## Features
 
 - Drag and drop, or open with <kbd>⌘O</kbd> / <kbd>Ctrl+O</kbd>
+- Markdown and PDF in the same window — the file type is detected for you
 - GitHub-flavoured Markdown — tables, task lists, strikethrough, fenced code
 - Syntax highlighting with a copy button on every code block
+- PDFs render page by page, fitted to the window and redrawn when you resize
 - Outline sidebar generated from headings, highlighting the section you are reading
 - Works on a phone: the outline becomes a slide-over, tables and code scroll on their own
 - Light or dark, remembered between visits
@@ -47,9 +49,10 @@ To host your own copy, point any static host at the repository root. No configur
 
 [marked](https://github.com/markedjs/marked) for parsing,
 [DOMPurify](https://github.com/cure53/DOMPurify) for sanitising,
-[highlight.js](https://github.com/highlightjs/highlight.js) for code.
-All three load from jsDelivr, so the first open needs a connection. For a fully offline
-copy, download the three files into `vendor/` and repoint the `<script>` tags.
+[highlight.js](https://github.com/highlightjs/highlight.js) for code,
+[pdf.js](https://github.com/mozilla/pdf.js) for PDFs (loaded only when you open one).
+They come from jsDelivr, so the first open needs a connection. For a fully offline
+copy, download them into `vendor/` and repoint the `<script>` tags.
 
 ## Contributing
 
