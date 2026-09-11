@@ -18,9 +18,9 @@ into someone else's server. This one is a page you open. Your file is read by th
 - Drag and drop, or open with <kbd>⌘O</kbd> / <kbd>Ctrl+O</kbd>
 - GitHub-flavoured Markdown — tables, task lists, strikethrough, fenced code
 - Syntax highlighting with a copy button on every code block
-- Outline sidebar generated from headings, with the current section highlighted while you scroll
-- Serif or sans reading typeface, light or dark, both remembered
-- Reading progress bar and a word / minute count
+- Outline sidebar generated from headings, highlighting the section you are reading
+- Works on a phone: the outline becomes a slide-over, tables and code scroll on their own
+- Light or dark, remembered between visits
 - Print or save to PDF with the interface stripped out
 - Rendered HTML sanitised with DOMPurify
 
