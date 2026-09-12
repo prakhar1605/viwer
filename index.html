@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Viwer — read Markdown and PDF files in your browser</title>
-<meta name="description" content="A single-file viewer for Markdown and PDF. Open a file and read it. Nothing is uploaded." />
+<title>Viwer — read Markdown files in your browser</title>
+<meta name="description" content="A single-file Markdown viewer. Open a .md file and read it. Nothing is uploaded." />
 <meta name="theme-color" content="#0f1216" />
 <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
@@ -144,22 +144,6 @@ main{flex:1; display:flex; min-height:0}
 pre:hover .copy,.copy:focus-visible{opacity:1}
 .copy:hover{color:var(--accent); border-color:var(--accent); background:var(--paper)}
 
-/* pdf pages */
-.pages{max-width:52rem; margin:0 auto; padding:26px 20px 90px; display:grid; gap:18px}
-.pages[hidden]{display:none}
-.page{
-  position:relative; border:1px solid var(--rule); border-radius:6px;
-  overflow:hidden; background:#fff;
-}
-.page canvas{display:block; width:100%; height:auto}
-.page .num{
-  position:absolute; right:8px; bottom:8px; font-size:11px; color:#5b6169;
-  background:rgba(255,255,255,.88); border-radius:4px; padding:2px 7px;
-}
-.status{
-  padding:60px 20px; text-align:center; color:var(--quiet); font-size:14px;
-}
-
 /* drop overlay */
 .drop{
   position:fixed; inset:0; z-index:60; display:none; place-items:center;
@@ -211,11 +195,11 @@ pre:hover .copy,.copy:focus-visible{opacity:1}
   <button id="themeBtn" title="Switch theme">Light</button>
   <button id="openBtn" class="solid">Open file</button>
 </header>
-<input type="file" id="fileInput" accept=".md,.markdown,.mdown,.mkd,.mdx,.txt,.pdf,application/pdf" hidden />
+<input type="file" id="fileInput" accept=".md,.markdown,.mdown,.mkd,.mdx,.txt" hidden />
 
 <section class="home" id="home">
-  <h1>Read Markdown and PDF in your browser</h1>
-  <p>Open a <code>.md</code> or <code>.pdf</code> file and it renders here. Nothing is uploaded.</p>
+  <h1>Read Markdown in your browser</h1>
+  <p>Open a <code>.md</code> file and it renders here. Nothing is uploaded.</p>
   <div class="zone" id="zone">
     <span class="big">Drop a file here</span>
     <button class="solid" id="openBtn2">Choose file</button>
@@ -231,7 +215,6 @@ pre:hover .copy,.copy:focus-visible{opacity:1}
   </nav>
   <div class="stage" id="stage">
     <article class="doc" id="doc"></article>
-    <div class="pages" id="pages" hidden></div>
   </div>
 </main>
 
@@ -355,7 +338,10 @@ function decorate() {
   });
 }
 
-function enterReader(name) {
+function render(md, name) {
+  doc.innerHTML = DOMPurify.sanitize(marked.parse(md));
+  decorate();
+  buildOutline();
   $("home").hidden = true;
   $("reader").hidden = false;
   $("name").hidden = false;
@@ -363,105 +349,16 @@ function enterReader(name) {
   $("grow").hidden = true;
   document.title = `${name} — Viwer`;
   stage.scrollTop = 0;
-}
-
-function render(md, name) {
-  currentPdf = null;
-  doc.innerHTML = DOMPurify.sanitize(marked.parse(md));
-  decorate();
-  buildOutline();
-  $("pages").hidden = true;
-  doc.hidden = false;
-  enterReader(name);
   highlightActive();
-}
-
-const PDFJS = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/";
-let currentPdf = null, pdfLib = null;
-
-function loadPdfLib() {
-  if (pdfLib) return pdfLib;
-  pdfLib = new Promise((resolve, reject) => {
-    const s = document.createElement("script");
-    s.src = PDFJS + "pdf.min.js";
-    s.onload = () => {
-      window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + "pdf.worker.min.js";
-      resolve(window.pdfjsLib);
-    };
-    s.onerror = () => { pdfLib = null; reject(new Error("pdf.js failed to load")); };
-    document.head.appendChild(s);
-  });
-  return pdfLib;
-}
-
-async function paintPdf() {
-  const pages = $("pages");
-  if (!currentPdf) return;
-  const pdf = currentPdf;
-  const width = Math.max(280, pages.clientWidth - 40);
-  const dpr = Math.min(devicePixelRatio || 1, 2);
-  pages.innerHTML = "";
-  for (let n = 1; n <= pdf.numPages; n++) {
-    if (currentPdf !== pdf) return;
-    const page = await pdf.getPage(n);
-    const base = page.getViewport({ scale: 1 });
-    const viewport = page.getViewport({ scale: width / base.width });
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.floor(viewport.width * dpr);
-    canvas.height = Math.floor(viewport.height * dpr);
-    const wrap = document.createElement("div");
-    wrap.className = "page";
-    const num = document.createElement("span");
-    num.className = "num";
-    num.textContent = `${n} / ${pdf.numPages}`;
-    wrap.append(canvas, num);
-    pages.appendChild(wrap);
-    await page.render({
-      canvasContext: canvas.getContext("2d"),
-      viewport,
-      transform: dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null
-    }).promise;
-  }
-}
-
-async function openPdf(file) {
-  doc.hidden = true;
-  doc.innerHTML = "";
-  $("railBtn").hidden = true;
-  $("rail").hidden = true;
-  $("scrim").hidden = true;
-  links = [];
-  $("pages").hidden = false;
-  $("pages").innerHTML = '<p class="status">Opening…</p>';
-  enterReader(file.name);
-  try {
-    const [lib, data] = await Promise.all([loadPdfLib(), file.arrayBuffer()]);
-    currentPdf = await lib.getDocument({ data }).promise;
-    $("name").textContent = `${file.name} — ${currentPdf.numPages} pages`;
-    await paintPdf();
-  } catch (err) {
-    currentPdf = null;
-    $("pages").innerHTML =
-      '<p class="status">That PDF could not be opened. It may be damaged or password protected.</p>';
-  }
 }
 
 function openFile(file) {
   if (!file) return;
-  const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
-  if (isPdf) { openPdf(file); return; }
   const reader = new FileReader();
   reader.onload = () => render(String(reader.result), file.name);
   reader.onerror = () => alert("That file could not be read. Try another one.");
   reader.readAsText(file);
 }
-
-let resizeTimer;
-addEventListener("resize", () => {
-  if (!currentPdf) return;
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(paintPdf, 250);
-});
 
 function highlightActive() {
   if (!links.length) return;
