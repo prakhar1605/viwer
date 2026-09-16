@@ -1,7 +1,7 @@
 # viwer
 
-A single-file Markdown viewer. It opens straight into a rendered document — drop a `.md` file
-and that document becomes yours. Nothing is uploaded, nothing is stored.
+A single-file Markdown viewer. It opens to an empty page with one **Open file** button in the
+corner. Pick a `.md` and read it. Nothing is uploaded, nothing is stored.
 
 **[viwer-sigma.vercel.app](https://viwer-sigma.vercel.app/)**
 
@@ -16,14 +16,13 @@ into someone else's server. This one is a page you open. Your file is read by th
 
 ## Features
 
-- No landing page — the reader is the page, with a sample document in it until you open your own
+- No interface to speak of — a single button, top right, and then only your document
 - Drag and drop, or open with <kbd>⌘O</kbd> / <kbd>Ctrl+O</kbd>
 - GitHub-flavoured Markdown — tables, task lists, strikethrough, fenced code
 - Syntax highlighting with a copy button on every code block
-- Outline sidebar generated from headings, highlighting the section you are reading
-- Works on a phone: the outline becomes a slide-over, tables and code scroll on their own
-- Light or dark, remembered between visits
-- Print or save to PDF with the interface stripped out
+- Follows your system light or dark setting
+- Reads on a phone: tables and code blocks scroll on their own
+- Print or save to PDF with the button stripped out
 - Rendered HTML sanitised with DOMPurify
 
 ## Run it
@@ -59,6 +58,7 @@ Issues and pull requests are welcome. The whole app is one file, so:
 
 1. Edit `index.html`
 2. Open it in a browser and check light mode, dark mode, and a narrow window
+   (light and dark follow `prefers-color-scheme`, so switch it at the OS level)
 3. Open a PR describing what changed and why
 
 Keep it dependency-light and keep it to a single file — that constraint is the point.
