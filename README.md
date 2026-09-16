@@ -1,6 +1,7 @@
 # viwer
 
-A single-file Markdown viewer. Drop a `.md` file, read it. Nothing is uploaded, nothing is stored.
+A single-file Markdown viewer. It opens straight into a rendered document — drop a `.md` file
+and that document becomes yours. Nothing is uploaded, nothing is stored.
 
 **[viwer-sigma.vercel.app](https://viwer-sigma.vercel.app/)**
 
@@ -15,6 +16,7 @@ into someone else's server. This one is a page you open. Your file is read by th
 
 ## Features
 
+- No landing page — the reader is the page, with a sample document in it until you open your own
 - Drag and drop, or open with <kbd>⌘O</kbd> / <kbd>Ctrl+O</kbd>
 - GitHub-flavoured Markdown — tables, task lists, strikethrough, fenced code
 - Syntax highlighting with a copy button on every code block

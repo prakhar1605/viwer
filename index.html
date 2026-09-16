@@ -43,8 +43,6 @@ body{
   font-size:13px; color:var(--quiet); flex:1; min-width:0;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
-.name[hidden]{display:none}
-.grow{flex:1}
 button{
   font:inherit; font-size:13px; line-height:1; padding:8px 11px; border-radius:7px;
   border:1px solid transparent; background:none; color:var(--quiet); cursor:pointer;
@@ -52,32 +50,6 @@ button{
 button:hover{background:var(--sheet); color:var(--ink)}
 .solid{border-color:var(--rule); color:var(--ink); font-weight:500; padding:8px 14px}
 .solid:hover{border-color:var(--accent); color:var(--accent); background:none}
-
-/* landing */
-.home{
-  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:18px; padding:40px 22px 64px; text-align:center;
-}
-.home h1{
-  margin:0; font-size:clamp(22px,5.2vw,30px); font-weight:600;
-  letter-spacing:-.025em; line-height:1.25;
-}
-.home p{margin:0; color:var(--quiet); font-size:15px; max-width:34ch; line-height:1.55}
-.home p code{
-  font-family:var(--mono); font-size:.87em; background:var(--code);
-  padding:.12em .38em; border-radius:4px;
-}
-.zone{
-  width:100%; max-width:420px; border:1.5px dashed var(--rule); border-radius:14px;
-  padding:32px 22px; display:flex; flex-direction:column; align-items:center; gap:14px;
-  background:var(--sheet);
-}
-.zone .big{font-size:15px; color:var(--ink); font-weight:500}
-.zone .sm{font-size:13px; color:var(--quiet)}
-.link{
-  background:none; border:0; padding:0; font-size:13px; color:var(--accent);
-  text-decoration:underline; text-underline-offset:3px; cursor:pointer;
-}
 
 /* reader */
 main{flex:1; display:flex; min-height:0}
@@ -169,8 +141,6 @@ pre:hover .copy,.copy:focus-visible{opacity:1}
   .doc{padding:28px 18px 96px; font-size:16px}
   .doc h1{font-size:1.6em}
   .doc h2{font-size:1.3em}
-  .home{padding:28px 18px 56px; gap:16px}
-  .zone{padding:26px 18px}
   .rail{
     position:fixed; top:50px; bottom:0; left:0; width:min(78vw,290px); z-index:40;
     border-right:1px solid var(--rule); box-shadow:0 0 40px rgba(0,0,0,.28);
@@ -189,25 +159,14 @@ pre:hover .copy,.copy:focus-visible{opacity:1}
 <body>
 <header class="bar">
   <span class="mark">vi<b>wer</b></span>
-  <span class="name" id="name" hidden></span>
-  <span class="grow" id="grow"></span>
+  <span class="name" id="name"></span>
   <button id="railBtn" hidden aria-expanded="false">Outline</button>
   <button id="themeBtn" title="Switch theme">Light</button>
   <button id="openBtn" class="solid">Open file</button>
 </header>
 <input type="file" id="fileInput" accept=".md,.markdown,.mdown,.mkd,.mdx,.txt" hidden />
 
-<section class="home" id="home">
-  <h1>Read Markdown in your browser</h1>
-  <p>Open a <code>.md</code> file and it renders here. Nothing is uploaded.</p>
-  <div class="zone" id="zone">
-    <span class="big">Drop a file here</span>
-    <button class="solid" id="openBtn2">Choose file</button>
-    <span class="sm">or open the <button class="link" id="sampleBtn">sample document</button></span>
-  </div>
-</section>
-
-<main id="reader" hidden>
+<main id="reader">
   <div class="scrim" id="scrim" hidden></div>
   <nav class="rail" id="rail" hidden aria-label="Outline">
     <h2>Outline</h2>
@@ -223,7 +182,12 @@ pre:hover .copy,.copy:focus-visible{opacity:1}
 <script type="text/markdown" id="sampleDoc">
 # Markdown, briefly
 
-Markdown is plain text that stays readable before anything renders it.
+This page is a Markdown reader. Press **Open file** in the corner — or drop a
+`.md` file anywhere on this page — and your document replaces this one. The file
+never leaves your machine; nothing is uploaded.
+
+Until then, here is something to read. Markdown is plain text that stays
+readable before anything renders it.
 
 ## Text
 
@@ -257,6 +221,12 @@ def read(path: str) -> str:
 | `# Title` | Heading, and an outline entry |
 | `> quote` | Blockquote |
 | `---` | Horizontal rule |
+
+## Getting around
+
+Headings become the outline on the left, and the entry you are reading stays
+marked as you scroll. Code blocks carry a copy button. The theme switch sits
+next to **Open file**, and `Cmd`/`Ctrl` + `O` opens a file from anywhere.
 
 That is most of the language. Open one of your own files to see it work.
 </script>
@@ -338,19 +308,19 @@ function decorate() {
   });
 }
 
-function render(md, name) {
+const siteTitle = document.title;
+
+function render(md, name, sample = false) {
   doc.innerHTML = DOMPurify.sanitize(marked.parse(md));
   decorate();
   buildOutline();
-  $("home").hidden = true;
-  $("reader").hidden = false;
-  $("name").hidden = false;
   $("name").textContent = name;
-  $("grow").hidden = true;
-  document.title = `${name} — Viwer`;
+  document.title = sample ? siteTitle : `${name} — Viwer`;
   stage.scrollTop = 0;
   highlightActive();
 }
+
+render($("sampleDoc").textContent.trim(), "Markdown, briefly", true);
 
 function openFile(file) {
   if (!file) return;
@@ -382,11 +352,7 @@ setTheme(saved || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" :
 
 const pick = () => $("fileInput").click();
 $("openBtn").addEventListener("click", pick);
-$("openBtn2").addEventListener("click", pick);
-$("zone").addEventListener("click", (e) => { if (e.target === $("zone")) pick(); });
 $("fileInput").addEventListener("change", (e) => openFile(e.target.files[0]));
-$("sampleBtn").addEventListener("click", () =>
-  render($("sampleDoc").textContent.trim(), "Markdown, briefly"));
 $("themeBtn").addEventListener("click", () =>
   setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
 
